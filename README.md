@@ -52,6 +52,8 @@ Once you have a Web Socket client connected you can use JSON message formats bel
 
 ### Response
 
+The **body** of the response object is a JSON encoded string.  Use JSON.parse to get the response object.  **output.completion** will contain the full response.
+
 ```json
 {
     "task_id": "000001",
