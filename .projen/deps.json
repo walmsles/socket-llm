@@ -77,7 +77,19 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-sdk/client-apigatewaymanagementapi",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-sdk/client-bedrock-runtime",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/client-eventbridge",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/client-sqs",
       "type": "runtime"
     },
     {

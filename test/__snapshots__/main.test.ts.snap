@@ -62,123 +62,6 @@ exports[`Snapshot 1`] = `
     },
   },
   "Resources": {
-    "llmresponder5407FCA4": {
-      "DependsOn": [
-        "llmresponderServiceRoleDefaultPolicy5B9280B4",
-        "llmresponderServiceRole09479F37",
-      ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "c9354a46ad0a2a3ba3a967b89fbf4145a75025318a65307ff44c6f30b45c577c.zip",
-        },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
-        },
-        "Handler": "index.llmResponderFunc",
-        "Role": {
-          "Fn::GetAtt": [
-            "llmresponderServiceRole09479F37",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs18.x",
-        "Timeout": 360,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "llmresponderEventInvokeConfig324B7645": {
-      "Properties": {
-        "DestinationConfig": {
-          "OnFailure": {
-            "Destination": {
-              "Fn::GetAtt": [
-                "llmtasksnotifyqueue10A15E2F",
-                "Arn",
-              ],
-            },
-          },
-          "OnSuccess": {
-            "Destination": {
-              "Fn::GetAtt": [
-                "llmtasksnotifyqueue10A15E2F",
-                "Arn",
-              ],
-            },
-          },
-        },
-        "FunctionName": {
-          "Ref": "llmresponder5407FCA4",
-        },
-        "Qualifier": "$LATEST",
-      },
-      "Type": "AWS::Lambda::EventInvokeConfig",
-    },
-    "llmresponderServiceRole09479F37": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "llmresponderServiceRoleDefaultPolicy5B9280B4": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sqs:SendMessage",
-                "sqs:GetQueueAttributes",
-                "sqs:GetQueueUrl",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "llmtasksnotifyqueue10A15E2F",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "llmresponderServiceRoleDefaultPolicy5B9280B4",
-        "Roles": [
-          {
-            "Ref": "llmresponderServiceRole09479F37",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
     "llmtasksdevllmtasksFC75FC5D": {
       "Properties": {
         "ApiId": {
@@ -188,6 +71,50 @@ exports[`Snapshot 1`] = `
         "StageName": "dev",
       },
       "Type": "AWS::ApiGatewayV2::Stage",
+    },
+    "llmtasksdevllmtasksllmnotifyrule16B6B6A1": {
+      "Properties": {
+        "EventBusName": {
+          "Ref": "llmtaskstaskbus95EADA2E",
+        },
+        "EventPattern": {
+          "detail-type": [
+            "llm-notify",
+          ],
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "notifier7B9417FE",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
+    "llmtasksdevllmtasksllmnotifyruleAllowEventRuletestnotifierFD7AFA815C714F17": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "notifier7B9417FE",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "llmtasksdevllmtasksllmnotifyrule16B6B6A1",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
     },
     "llmtasksdevllmtasksllmresponderrule22500EF9": {
       "Properties": {
@@ -204,7 +131,7 @@ exports[`Snapshot 1`] = `
           {
             "Arn": {
               "Fn::GetAtt": [
-                "llmresponder5407FCA4",
+                "responder19839FC5",
                 "Arn",
               ],
             },
@@ -214,12 +141,12 @@ exports[`Snapshot 1`] = `
       },
       "Type": "AWS::Events::Rule",
     },
-    "llmtasksdevllmtasksllmresponderruleAllowEventRuletestllmresponder0838ADEE31B59FC0": {
+    "llmtasksdevllmtasksllmresponderruleAllowEventRuletestresponderC40A85B56F256E26": {
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
           "Fn::GetAtt": [
-            "llmresponder5407FCA4",
+            "responder19839FC5",
             "Arn",
           ],
         },
@@ -227,6 +154,50 @@ exports[`Snapshot 1`] = `
         "SourceArn": {
           "Fn::GetAtt": [
             "llmtasksdevllmtasksllmresponderrule22500EF9",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "llmtasksdevllmtasksllmstreamerrule523828C7": {
+      "Properties": {
+        "EventBusName": {
+          "Ref": "llmtaskstaskbus95EADA2E",
+        },
+        "EventPattern": {
+          "detail-type": [
+            "llm-streamer",
+          ],
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "streamer32885AC9",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
+    "llmtasksdevllmtasksllmstreamerruleAllowEventRuleteststreamer085C7CDC1085316E": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "streamer32885AC9",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "llmtasksdevllmtasksllmstreamerrule523828C7",
             "Arn",
           ],
         },
@@ -585,6 +556,521 @@ exports[`Snapshot 1`] = `
         "Name": "testllmtaskstaskbus12DEA9C9",
       },
       "Type": "AWS::Events::EventBus",
+    },
+    "notifier7B9417FE": {
+      "DependsOn": [
+        "notifierServiceRoleDefaultPolicy8CBED144",
+        "notifierServiceRole47DF7710",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.llmNotifyFunc",
+        "Role": {
+          "Fn::GetAtt": [
+            "notifierServiceRole47DF7710",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 3,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "notifierEventInvokeConfigC9C30046": {
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+        },
+        "FunctionName": {
+          "Ref": "notifier7B9417FE",
+        },
+        "Qualifier": "$LATEST",
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig",
+    },
+    "notifierServiceRole47DF7710": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "notifierServiceRoleDefaultPolicy8CBED144": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtasksnotifyqueue10A15E2F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "notifierServiceRoleDefaultPolicy8CBED144",
+        "Roles": [
+          {
+            "Ref": "notifierServiceRole47DF7710",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "notifyQ292E7C49": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "FifoQueue": true,
+      },
+      "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "notifysourceF2F8C83F": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "notifyQ292E7C49",
+            "Arn",
+          ],
+        },
+        "FunctionName": {
+          "Ref": "streamNotifyB2D7B6E9",
+        },
+        "FunctionResponseTypes": [
+          "ReportBatchItemFailures",
+        ],
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "responder19839FC5": {
+      "DependsOn": [
+        "responderServiceRoleDefaultPolicy27BCBA63",
+        "responderServiceRoleBF57CB25",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.llmResponderFunc",
+        "Role": {
+          "Fn::GetAtt": [
+            "responderServiceRoleBF57CB25",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 360,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "responderEventInvokeConfig0911D1E6": {
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+        },
+        "FunctionName": {
+          "Ref": "responder19839FC5",
+        },
+        "Qualifier": "$LATEST",
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig",
+    },
+    "responderServiceRoleBF57CB25": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "responderServiceRoleDefaultPolicy27BCBA63": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "bedrock:InvokeModel",
+              "Effect": "Allow",
+              "Resource": "arn:aws:bedrock:us-west-2::foundation-model/*",
+            },
+            {
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtasksnotifyqueue10A15E2F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "responderServiceRoleDefaultPolicy27BCBA63",
+        "Roles": [
+          {
+            "Ref": "responderServiceRoleBF57CB25",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "streamNotifyB2D7B6E9": {
+      "DependsOn": [
+        "streamNotifyServiceRoleDefaultPolicyF1F13E51",
+        "streamNotifyServiceRoleFA968F2B",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "a9b62542d5710264716c6860739766687b371ebe5016842f8df90f6d48347f96.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "WEBSOCKET_API": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "llmtasksdevllmtaskssocketE00BE865",
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region",
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/dev",
+                ],
+              ],
+            },
+          },
+        },
+        "Handler": "index.streamHandler",
+        "Role": {
+          "Fn::GetAtt": [
+            "streamNotifyServiceRoleFA968F2B",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 10,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "streamNotifyServiceRoleDefaultPolicyF1F13E51": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:GetQueueUrl",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "notifyQ292E7C49",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "streamNotifyServiceRoleDefaultPolicyF1F13E51",
+        "Roles": [
+          {
+            "Ref": "streamNotifyServiceRoleFA968F2B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "streamNotifyServiceRoleFA968F2B": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "streamer32885AC9": {
+      "DependsOn": [
+        "streamerServiceRoleDefaultPolicyB95937A1",
+        "streamerServiceRole2EA5475B",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "NOTIFY_QUEUE": {
+              "Ref": "notifyQ292E7C49",
+            },
+          },
+        },
+        "Handler": "index.llmStreamerFunc",
+        "Role": {
+          "Fn::GetAtt": [
+            "streamerServiceRole2EA5475B",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 360,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "streamerEventInvokeConfig03CC3516": {
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+        },
+        "FunctionName": {
+          "Ref": "streamer32885AC9",
+        },
+        "Qualifier": "$LATEST",
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig",
+    },
+    "streamerServiceRole2EA5475B": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "streamerServiceRoleDefaultPolicyB95937A1": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "notifyQ292E7C49",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": "bedrock:InvokeModelWithResponseStream",
+              "Effect": "Allow",
+              "Resource": "arn:aws:bedrock:us-west-2::foundation-model/*",
+            },
+            {
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtasksnotifyqueue10A15E2F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "streamerServiceRoleDefaultPolicyB95937A1",
+        "Roles": [
+          {
+            "Ref": "streamerServiceRole2EA5475B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
   },
   "Rules": {

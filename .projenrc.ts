@@ -12,6 +12,9 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '@aws-sdk/client-bedrock-runtime',
     '@aws-cdk/aws-apigatewayv2-alpha@^2.100.0-alpha.0',
     '@aws-cdk/aws-apigatewayv2-integrations-alpha@^2.100.0-alpha.0',
+    '@aws-sdk/client-eventbridge',
+    '@aws-sdk/client-sqs',
+    '@aws-sdk/client-apigatewaymanagementapi',
   ],
   // packageName: undefined,  /* The "name" in package.json. */
 });
