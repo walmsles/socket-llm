@@ -27,6 +27,84 @@ $ yarn build
 $ yarn deploy
 ```
 
+Following deployment output will be displayed showing the Web Socket URL which can be used by a Web UI to connect to for sending and receiving messages.
+
+# I Have My UI connected, Now What?
+
+Once you have a Web Socket client connected you can use JSON message formats below to send to either the **llmResponder** task or **llmStreamer** task.
+
+## llmResponder Task JSON
+
+### Request
+
+```json
+{
+    "action": "task-submit",
+    "task": {
+        "id": "000001",
+        "type": "llm-responder",
+        "data": {
+            "question": "<insert question text here>"
+        }
+    }
+}
+```
+
+### Response
+
+```json
+{
+    "task_id": "000001",
+    "status": "Success",
+    "response": {
+        "statusCode": 200,
+        "body": "{\"output\":\"{\\\"completion\\\":\\\"<response appears here>\\\",\\\"stop_reason\\\":\\\"stop_sequence\\\",\\\"stop\\\":\\\"\\\\n\\\\nHuman:\\\"}\"}"
+    }
+}
+```
+
+## llmStreamer Task JSON
+
+### Request
+```json
+{
+    "action": "task-submit",
+    "task": {
+        "id": "000001",
+        "type": "llm-streamer",
+        "data": {
+            "question": "<insert question text here>"
+        }
+    }
+}
+```
+
+### Response
+
+#### Partial Stream Response
+
+```json
+{
+    "task_id": "000001",
+    "status": "Success",
+    "response": "<partial response here>"
+}
+```
+
+#### Complete Stream Response (no more partials coming)
+
+```json
+{
+    "task_id": "000001",
+    "status": "Success",
+    "response": {
+        "statusCode": 200,
+        "body": "{\"output\":\"Finished\"}"
+    }
+}
+```
+
+
 # General Disclaimer
 
 This is an experimental Proof of Concept project and is not a complete, finished product.  It should be used to examine implementation details for interacting with AWS Bedrock LLM models (Claude V2) using either a complete API call response or streaming response.
