@@ -7,7 +7,12 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
+  deps: [
+    '@serverless-dna/constructs',
+    '@aws-sdk/client-bedrock-runtime',
+    '@aws-cdk/aws-apigatewayv2-alpha@^2.100.0-alpha.0',
+    '@aws-cdk/aws-apigatewayv2-integrations-alpha@^2.100.0-alpha.0',
+  ],
   // packageName: undefined,  /* The "name" in package.json. */
 });
 project.synth();

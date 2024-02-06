@@ -1,0 +1,618 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot 1`] = `
+{
+  "Outputs": {
+    "llmtasksCallbackUrl18B0FF35": {
+      "Export": {
+        "Name": "dev-llm-tasks-CallbackUrl",
+      },
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "llmtasksdevllmtaskssocketE00BE865",
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/dev",
+          ],
+        ],
+      },
+    },
+    "llmtasksStageUrl02F280EB": {
+      "Export": {
+        "Name": "dev-llm-tasks-StageUrl",
+      },
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "wss://",
+            {
+              "Ref": "llmtasksdevllmtaskssocketE00BE865",
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/dev",
+          ],
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "llmresponder5407FCA4": {
+      "DependsOn": [
+        "llmresponderServiceRoleDefaultPolicy5B9280B4",
+        "llmresponderServiceRole09479F37",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "c9354a46ad0a2a3ba3a967b89fbf4145a75025318a65307ff44c6f30b45c577c.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.llmResponderFunc",
+        "Role": {
+          "Fn::GetAtt": [
+            "llmresponderServiceRole09479F37",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 360,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "llmresponderEventInvokeConfig324B7645": {
+      "Properties": {
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "llmtasksnotifyqueue10A15E2F",
+                "Arn",
+              ],
+            },
+          },
+        },
+        "FunctionName": {
+          "Ref": "llmresponder5407FCA4",
+        },
+        "Qualifier": "$LATEST",
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig",
+    },
+    "llmresponderServiceRole09479F37": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "llmresponderServiceRoleDefaultPolicy5B9280B4": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtasksnotifyqueue10A15E2F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "llmresponderServiceRoleDefaultPolicy5B9280B4",
+        "Roles": [
+          {
+            "Ref": "llmresponderServiceRole09479F37",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "llmtasksdevllmtasksFC75FC5D": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "llmtasksdevllmtaskssocketE00BE865",
+        },
+        "AutoDeploy": true,
+        "StageName": "dev",
+      },
+      "Type": "AWS::ApiGatewayV2::Stage",
+    },
+    "llmtasksdevllmtasksllmresponderrule22500EF9": {
+      "Properties": {
+        "EventBusName": {
+          "Ref": "llmtaskstaskbus95EADA2E",
+        },
+        "EventPattern": {
+          "detail-type": [
+            "llm-responder",
+          ],
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "llmresponder5407FCA4",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
+    "llmtasksdevllmtasksllmresponderruleAllowEventRuletestllmresponder0838ADEE31B59FC0": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "llmresponder5407FCA4",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "llmtasksdevllmtasksllmresponderrule22500EF9",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "llmtasksdevllmtaskssocketE00BE865": {
+      "Properties": {
+        "Name": "dev-llm-tasks-socket",
+        "ProtocolType": "WEBSOCKET",
+        "RouteSelectionExpression": "$request.body.action",
+      },
+      "Type": "AWS::ApiGatewayV2::Api",
+    },
+    "llmtasksdevllmtaskssockettasksubmitRoute9BF293D8": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "llmtasksdevllmtaskssocketE00BE865",
+        },
+        "AuthorizationType": "NONE",
+        "RouteKey": "task-submit",
+        "Target": {
+          "Fn::Join": [
+            "",
+            [
+              "integrations/",
+              {
+                "Ref": "llmtasksdevllmtaskssockettasksubmitRouteintegrationtasksubmit85535114",
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::ApiGatewayV2::Route",
+    },
+    "llmtasksdevllmtaskssockettasksubmitRouteintegrationtasksubmit85535114": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "llmtasksdevllmtaskssocketE00BE865",
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":apigateway:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":lambda:path/2015-03-31/functions/",
+              {
+                "Fn::GetAtt": [
+                  "llmtaskssubmit713BDD0E",
+                  "Arn",
+                ],
+              },
+              "/invocations",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::ApiGatewayV2::Integration",
+    },
+    "llmtasksdevllmtaskssockettasksubmitRouteintegrationtasksubmitPermission47940048": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "llmtaskssubmit713BDD0E",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "llmtasksdevllmtaskssocketE00BE865",
+              },
+              "/*/*task-submit",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "llmtasksnotify024EE513": {
+      "DependsOn": [
+        "llmtasksnotifyServiceRoleDefaultPolicyC716CDD2",
+        "llmtasksnotifyServiceRoleBD9C8F82",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "15a3ae7deb68e45637fe1ba286d21ec208cb18eafd84ce0bcdaee9b69f0d8d13.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "WEBSOCKET_API": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "llmtasksdevllmtaskssocketE00BE865",
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region",
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/dev",
+                ],
+              ],
+            },
+          },
+        },
+        "Handler": "index.taskNotifyHandler",
+        "Role": {
+          "Fn::GetAtt": [
+            "llmtasksnotifyServiceRoleBD9C8F82",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "llmtasksnotifyServiceRoleBD9C8F82": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "llmtasksnotifyServiceRoleDefaultPolicyC716CDD2": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "execute-api:ManageConnections",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":",
+                    {
+                      "Ref": "llmtasksdevllmtaskssocketE00BE865",
+                    },
+                    "/dev/*",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:GetQueueUrl",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtasksnotifyqueue10A15E2F",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "llmtasksnotifyServiceRoleDefaultPolicyC716CDD2",
+        "Roles": [
+          {
+            "Ref": "llmtasksnotifyServiceRoleBD9C8F82",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "llmtasksnotifyqueue10A15E2F": {
+      "DeletionPolicy": "Delete",
+      "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "llmtasksnotifysource3828C3F6": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "llmtasksnotifyqueue10A15E2F",
+            "Arn",
+          ],
+        },
+        "FunctionName": {
+          "Ref": "llmtasksnotify024EE513",
+        },
+        "FunctionResponseTypes": [
+          "ReportBatchItemFailures",
+        ],
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "llmtaskssubmit713BDD0E": {
+      "DependsOn": [
+        "llmtaskssubmitServiceRoleDefaultPolicy046F7D7F",
+        "llmtaskssubmitServiceRole59AB6712",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "8f2a8f0b444b19ff76441be12cd2be53354d1474d238119985c1366b07265f1c.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "TASK_BUS": {
+              "Ref": "llmtaskstaskbus95EADA2E",
+            },
+          },
+        },
+        "Handler": "index.taskSubmitHandler",
+        "Role": {
+          "Fn::GetAtt": [
+            "llmtaskssubmitServiceRole59AB6712",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "llmtaskssubmitServiceRole59AB6712": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "llmtaskssubmitServiceRoleDefaultPolicy046F7D7F": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "events:PutEvents",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "llmtaskstaskbus95EADA2E",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "llmtaskssubmitServiceRoleDefaultPolicy046F7D7F",
+        "Roles": [
+          {
+            "Ref": "llmtaskssubmitServiceRole59AB6712",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "llmtaskstaskbus95EADA2E": {
+      "Properties": {
+        "Name": "testllmtaskstaskbus12DEA9C9",
+      },
+      "Type": "AWS::Events::EventBus",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
