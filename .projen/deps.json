@@ -11,17 +11,17 @@
     },
     {
       "name": "@typescript-eslint/eslint-plugin",
-      "version": "^6",
+      "version": "^7",
       "type": "build"
     },
     {
       "name": "@typescript-eslint/parser",
-      "version": "^6",
+      "version": "^7",
       "type": "build"
     },
     {
       "name": "aws-cdk",
-      "version": "^2.1.0",
+      "version": "^2.147.0",
       "type": "build"
     },
     {
@@ -67,16 +67,6 @@
       "type": "build"
     },
     {
-      "name": "@aws-cdk/aws-apigatewayv2-alpha",
-      "version": "^2.100.0-alpha.0",
-      "type": "runtime"
-    },
-    {
-      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
-      "version": "^2.100.0-alpha.0",
-      "type": "runtime"
-    },
-    {
       "name": "@aws-sdk/client-apigatewaymanagementapi",
       "type": "runtime"
     },
@@ -85,20 +75,17 @@
       "type": "runtime"
     },
     {
-      "name": "@aws-sdk/client-eventbridge",
-      "type": "runtime"
-    },
-    {
       "name": "@aws-sdk/client-sqs",
       "type": "runtime"
     },
     {
       "name": "@serverless-dna/constructs",
+      "version": "^0.0.11",
       "type": "runtime"
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.1.0",
+      "version": "^2.147.0",
       "type": "runtime"
     },
     {

@@ -72,50 +72,6 @@ exports[`Snapshot 1`] = `
       },
       "Type": "AWS::ApiGatewayV2::Stage",
     },
-    "llmtasksdevllmtasksllmnotifyrule16B6B6A1": {
-      "Properties": {
-        "EventBusName": {
-          "Ref": "llmtaskstaskbus95EADA2E",
-        },
-        "EventPattern": {
-          "detail-type": [
-            "llm-notify",
-          ],
-        },
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "notifier7B9417FE",
-                "Arn",
-              ],
-            },
-            "Id": "Target0",
-          },
-        ],
-      },
-      "Type": "AWS::Events::Rule",
-    },
-    "llmtasksdevllmtasksllmnotifyruleAllowEventRuletestnotifierFD7AFA815C714F17": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "notifier7B9417FE",
-            "Arn",
-          ],
-        },
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "llmtasksdevllmtasksllmnotifyrule16B6B6A1",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
     "llmtasksdevllmtasksllmresponderrule22500EF9": {
       "Properties": {
         "EventBusName": {
@@ -295,7 +251,7 @@ exports[`Snapshot 1`] = `
               {
                 "Ref": "llmtasksdevllmtaskssocketE00BE865",
               },
-              "/*/*task-submit",
+              "/*task-submit",
             ],
           ],
         },
@@ -316,7 +272,6 @@ exports[`Snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
             "WEBSOCKET_API": {
               "Fn::Join": [
                 "",
@@ -346,7 +301,7 @@ exports[`Snapshot 1`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs18.x",
+        "Runtime": "nodejs20.x",
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -477,7 +432,6 @@ exports[`Snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
             "TASK_BUS": {
               "Ref": "llmtaskstaskbus95EADA2E",
             },
@@ -490,7 +444,7 @@ exports[`Snapshot 1`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs18.x",
+        "Runtime": "nodejs20.x",
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -557,126 +511,10 @@ exports[`Snapshot 1`] = `
       },
       "Type": "AWS::Events::EventBus",
     },
-    "notifier7B9417FE": {
-      "DependsOn": [
-        "notifierServiceRoleDefaultPolicy8CBED144",
-        "notifierServiceRole47DF7710",
-      ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
-        },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
-        },
-        "Handler": "index.llmNotifyFunc",
-        "Role": {
-          "Fn::GetAtt": [
-            "notifierServiceRole47DF7710",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs18.x",
-        "Timeout": 3,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "notifierEventInvokeConfigC9C30046": {
-      "Properties": {
-        "DestinationConfig": {
-          "OnFailure": {
-            "Destination": {
-              "Fn::GetAtt": [
-                "llmtasksnotifyqueue10A15E2F",
-                "Arn",
-              ],
-            },
-          },
-          "OnSuccess": {
-            "Destination": {
-              "Fn::GetAtt": [
-                "llmtasksnotifyqueue10A15E2F",
-                "Arn",
-              ],
-            },
-          },
-        },
-        "FunctionName": {
-          "Ref": "notifier7B9417FE",
-        },
-        "Qualifier": "$LATEST",
-      },
-      "Type": "AWS::Lambda::EventInvokeConfig",
-    },
-    "notifierServiceRole47DF7710": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "notifierServiceRoleDefaultPolicy8CBED144": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "sqs:SendMessage",
-                "sqs:GetQueueAttributes",
-                "sqs:GetQueueUrl",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "llmtasksnotifyqueue10A15E2F",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "notifierServiceRoleDefaultPolicy8CBED144",
-        "Roles": [
-          {
-            "Ref": "notifierServiceRole47DF7710",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
     "notifyQ292E7C49": {
       "DeletionPolicy": "Delete",
       "Properties": {
+        "ContentBasedDeduplication": true,
         "FifoQueue": true,
       },
       "Type": "AWS::SQS::Queue",
@@ -709,12 +547,7 @@ exports[`Snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
-        },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
+          "S3Key": "502832e2c86beff1ad77062066f597ab1f13cf5586598d26134f891a145448bb.zip",
         },
         "Handler": "index.llmResponderFunc",
         "Role": {
@@ -835,7 +668,6 @@ exports[`Snapshot 1`] = `
         },
         "Environment": {
           "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
             "WEBSOCKET_API": {
               "Fn::Join": [
                 "",
@@ -874,6 +706,34 @@ exports[`Snapshot 1`] = `
       "Properties": {
         "PolicyDocument": {
           "Statement": [
+            {
+              "Action": "execute-api:ManageConnections",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":",
+                    {
+                      "Ref": "llmtasksdevllmtaskssocketE00BE865",
+                    },
+                    "/dev/*",
+                  ],
+                ],
+              },
+            },
             {
               "Action": [
                 "sqs:ReceiveMessage",
@@ -943,11 +803,10 @@ exports[`Snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "751f6d9d2e6a762c20bb7b4828671559e91621f53cf0a8b8f724cb93d45a816e.zip",
+          "S3Key": "502832e2c86beff1ad77062066f597ab1f13cf5586598d26134f891a145448bb.zip",
         },
         "Environment": {
           "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
             "NOTIFY_QUEUE": {
               "Ref": "notifyQ292E7C49",
             },

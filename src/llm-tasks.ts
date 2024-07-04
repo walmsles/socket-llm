@@ -17,12 +17,12 @@ export const llmResponderFunc = async (event: any): Promise<any> => {
       The AI is talkative and provides specific details from its context but limits it to 1000 tokens.
       If the AI does not know the answer to a question, it truthfully says it does not know.
       
-      \n\nAssistant: OK, got it, I'll be a talkative truthful AI assistant.
+      \n\nAssistant: OK, got it, I'll be a truthful AI assistant and follow instructions to the letter!
       
-      \n\nHuman: Provide a detailed answer for, ${event.detail.question}
+      \n\nHuman: ${event.detail.question}
       
       \n\nAssistant:`,
-      max_tokens_to_sample: 500,
+      max_tokens_to_sample: 1000,
       temperature: 0.5,
       top_p: 0.999,
       top_k: 250,
@@ -37,9 +37,10 @@ export const llmResponderFunc = async (event: any): Promise<any> => {
   const llResponse = await llmClient.send(invokeLLM);
 
   const answer = await new TextDecoder().decode(llResponse.body);
+  const answerJson = JSON.parse(answer);
 
   const response = {
-    output: answer,
+    output: answerJson.completion,
   };
 
   return {
@@ -59,12 +60,12 @@ export const llmStreamerFunc = async (event: any): Promise<any> => {
       The AI is talkative and provides specific details from its context but limits it to 1000 tokens.
       If the AI does not know the answer to a question, it truthfully says it does not know.
       
-      \n\nAssistant: OK, got it, I'll be a talkative truthful AI assistant.
+      \n\nAssistant: OK, got it, I'll be a truthful AI assistant and follow instructions to the letter!
       
-      \n\nHuman: Provide a detailed answer for, ${event.detail.question}
+      \n\nHuman: ${event.detail.question}
       
       \n\nAssistant:`,
-      max_tokens_to_sample: 500,
+      max_tokens_to_sample: 1000,
       temperature: 0.5,
       top_p: 0.999,
       top_k: 250,
